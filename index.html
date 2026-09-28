@@ -79,6 +79,15 @@
         .cover .chip { display: inline-flex; gap: 6px; align-items: center; margin-top: 14px; padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 800;
                        color: #fff6dc; background: rgba(255,255,255,.12); border: 1px solid rgba(246,211,139,.45); backdrop-filter: blur(4px); }
         .cover .chip b { color: #f3cf86; font-size: 14px; }
+        .cover .dday { display: inline-flex; align-items: baseline; gap: 8px; margin-top: 16px; padding: 8px 20px 7px; border-radius: 14px;
+                       background: linear-gradient(180deg, rgba(255,246,220,.16), rgba(255,246,220,.06)); border: 1.5px solid rgba(246,211,139,.7); }
+        .cover .dday .l { font-size: 12px; font-weight: 800; color: rgba(255,246,220,.85); }
+        .cover .dday .v { font-family: 'Jua', sans-serif; font-size: 30px; line-height: 1; color: #f3cf86; letter-spacing: .02em; }
+        .cal-sum { margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 14px;
+                   background: linear-gradient(160deg, #fff7e6, #fdecc8); border: 1px solid #f3d38f; }
+        .cal-sum .l { font-size: 13px; font-weight: 800; color: #92400e; }
+        .cal-sum .v { font-family: 'Jua', sans-serif; font-size: 28px; line-height: 1; color: #b45309; }
+        .cal-sum .u { font-family: 'Jua', sans-serif; font-size: 16px; color: #b45309; }
         @media (prefers-reduced-motion: no-preference) { .pop { animation: pop .35s ease-out; } @keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } } }
     </style>
 </head>
@@ -94,6 +103,7 @@
             <div class="orn"><span></span><i></i><span></span></div>
             <p class="sub">계시록 통달 연습</p>
             <p class="date" id="cover-date"></p>
+            <div><div class="dday"><span class="l">11월 15일 시험까지</span><span class="v" id="cover-dday"></span></div></div>
             <div class="chip">매일 조금씩 · 연속 <b id="cover-streak">0</b>일</div>
         </header>
 
@@ -111,8 +121,6 @@
             <p class="font-black text-slate-800 text-[13px] mb-1">이렇게 풀어요</p>
             <ul class="space-y-0.5">
                 <li>• <b>풀 때마다 새 문제</b> — 시작할 때마다 문제은행에서 10문제를 무작위로 뽑아요. 전체 문제를 한 바퀴 다 풀 때까지 이미 나온 문제는 다시 나오지 않아요.</li>
-                <li>• 문항당 10점, 100점 만점. 띄어쓰기·문장부호는 채점에서 무시해요.</li>
-                <li>• 초중고 신학 서술형은 뜻이 맞으면 결과 화면에서 <b>“정답 인정”</b>을 누를 수 있어요.</li>
                 <li>• 답을 쓰고 <b>Enter</b>를 누르면 다음 문항으로 넘어가요.</li>
                 <li>• 채점까지 마친 날은 <b>공부한 날 달력</b>에 표시돼요. 쓰던 답은 자동 저장되고, 기록은 이 기기에만 남아요.</li>
             </ul>
@@ -133,7 +141,7 @@
                 <button id="cal-next" class="w-8 h-8 rounded-full hover:bg-amber-50 font-black text-amber-700 disabled:opacity-25" aria-label="다음 달">›</button>
             </div>
             <div id="cal" class="cal"></div>
-            <p id="cal-sum" class="text-[11px] text-slate-500 mt-2 text-center"></p>
+            <div id="cal-sum" class="cal-sum"></div>
         </div>
 
         <!-- 최근 기록 -->
@@ -369,6 +377,25 @@ function scoreBadge(score) {
 }
 
 // ───────── 홈 ─────────
+// 표지 날짜와 D-day — 한국 시간 오늘 기준. 시험 당일은 D-0일, 지나면 D+N일.
+const EXAM_DAY = '2026-11-15';
+function renderCoverDate() {
+    const today = kstDate(Date.now()), t = new Date(today + 'T00:00:00Z');
+    $('cover-date').textContent = `${t.getUTCFullYear()}. ${t.getUTCMonth() + 1}. ${t.getUTCDate()}. ${'일월화수목금토'[t.getUTCDay()]}요일`;
+    const left = Math.round((new Date(EXAM_DAY + 'T00:00:00Z') - t) / 864e5);
+    $('cover-dday').textContent = left >= 0 ? `D-${left}일` : `D+${-left}일`;
+}
+// 앱을 켜 둔 채 자정이 지나도 날짜·D-day·달력이 바뀌도록, 화면으로 돌아올 때와 1분마다 확인
+let shownDay = kstDate(Date.now());
+function refreshIfNewDay() {
+    const d = kstDate(Date.now());
+    if (d === shownDay) return;
+    shownDay = d; calMonth = d.slice(0, 7);
+    if (!$('view-home').classList.contains('hidden')) renderHome();
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshIfNewDay(); });
+setInterval(refreshIfNewDay, 60000);
+
 function renderHome() {
     const { s, g } = parseKey(store.sel);
     setTheme(s);
@@ -395,7 +422,7 @@ function renderHome() {
     while (days.has(d)) { streak++; d = addDays(d, -1); }
     $('stat-streak').textContent = streak;
     $('cover-streak').textContent = streak;
-    { const t = new Date(Date.now() + 9 * 3600e3); $('cover-date').textContent = `${t.getUTCFullYear()}. ${t.getUTCMonth() + 1}. ${t.getUTCDate()}. ${'일월화수목금토'[t.getUTCDay()]}요일`; }
+    renderCoverDate();
     renderCalendar(days);
 
     $('history-count').textContent = h.length ? `최근 ${Math.min(h.length, 15)}개` : '';
@@ -426,7 +453,7 @@ function renderCalendar(days) {
         html += `<div class="d ${done ? 'done' : ''} ${ds === today ? 'today' : ''} ${ds > today ? 'future' : ''}">${d}</div>`;
     }
     $('cal').innerHTML = html;
-    $('cal-sum').textContent = `이번 달 공부한 날 ${cnt}일`;
+    $('cal-sum').innerHTML = `<span class="l">${calMonth === today.slice(0, 7) ? '이번 달' : m + '월'} 공부한 날</span><span class="v">${cnt}</span><span class="u">일</span>`;
 }
 function shiftMonth(n) { const [y, m] = calMonth.split('-').map(Number); const t = new Date(Date.UTC(y, m - 1 + n, 1)); calMonth = t.toISOString().slice(0, 7); renderHome(); }
 $('cal-prev').onclick = () => shiftMonth(-1);
