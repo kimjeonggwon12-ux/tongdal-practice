@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="data.js"></script>
     <style>
         body { font-family: 'Noto Sans KR', sans-serif; background: #f4f1ea; -webkit-tap-highlight-color: transparent; }
@@ -35,28 +35,50 @@
         .pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; padding: 2px 9px; border-radius: 999px; }
         /* 홈 탭 */
         /* 과목 탭: 세 과목이 한눈에 보이도록 큼직하게 */
-        .subj { border-radius: 16px; padding: 12px 4px 10px; border: 2px solid #ece7dc; background: #faf8f3; transition: all .15s; text-align: center; }
-        .subj .i { font-size: 26px; line-height: 1; }
-        .subj .n { font-family: 'Jua', sans-serif; font-size: 17px; color: #57534e; margin-top: 6px; white-space: nowrap; }
-        .subj.on { border-color: var(--c1); background: var(--soft); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
-        .subj.on .n { color: var(--c2); }
+        .subj { position: relative; border-radius: 14px; padding: 14px 4px 12px; background: #f7f4ee; border: 1.5px solid #ebe5d9; transition: all .18s; text-align: center; overflow: hidden; }
+        .subj::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--c1); opacity: .35; transition: opacity .18s; }
+        .subj .k { font-size: 10px; font-weight: 900; letter-spacing: .14em; color: #a8a29e; }
+        .subj .n { font-family: 'Jua', sans-serif; font-size: 18px; color: #57534e; margin-top: 2px; white-space: nowrap; }
+        .subj.on { background: linear-gradient(160deg, var(--c1), var(--c2)); border-color: transparent; box-shadow: 0 6px 16px -6px var(--c1); transform: translateY(-1px); }
+        .subj.on::before { opacity: 0; }
+        .subj.on .k { color: rgba(255,255,255,.75); }
+        .subj.on .n { color: #fff; }
         /* 공부한 날 달력 */
         .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
         .cal .w { font-size: 10px; font-weight: 800; color: #a8a29e; padding-bottom: 2px; }
         .cal .d { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 12px; font-weight: 700; color: #78716c; position: relative; }
-        .cal .d.done { background: #b45309; color: #fff; }
-        .cal .d.done::after { content: '✔'; position: absolute; right: 2px; top: 0; font-size: 9px; color: #fde68a; }
+        .cal .d.done { background: linear-gradient(160deg, #c08a2e, #9a6417); color: #fff; box-shadow: 0 2px 6px -2px rgba(154,100,23,.7); }
         .cal .d.today { outline: 2px solid #f59e0b; outline-offset: -2px; }
         .cal .d.future { color: #d6d3d1; }
-        .gtab { border-radius: 12px; padding: 7px 0 6px; border: 2px solid var(--line); background: #fff; transition: all .15s; }
-        .gtab .g { font-family: 'Jua', sans-serif; font-size: 17px; color: var(--c1); line-height: 1.1; }
+        .gtabs { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--soft); border-radius: 12px; padding: 4px; gap: 4px; }
+        .gtab { border-radius: 9px; padding: 7px 0 5px; transition: all .15s; }
+        .gtab .g { font-family: 'Jua', sans-serif; font-size: 17px; color: var(--c2); line-height: 1.1; }
         .gtab .m { font-size: 10px; font-weight: 800; color: #a8a29e; }
-        .gtab.on { background: linear-gradient(135deg, var(--c1), var(--c2)); border-color: transparent; }
-        .gtab.on .g, .gtab.on .m { color: #fff; }
-        .hero { background: linear-gradient(160deg, #3b2f1e 0%, #6b4f2a 55%, #a8813f 100%); }
-        .signboard { display: inline-block; font-family: 'Jua', sans-serif; font-size: 44px; line-height: 1; color: #fff7e0; padding: 14px 26px 12px;
-                     border: 3px solid #fcd98a; border-radius: 18px; background: rgba(0,0,0,.18); letter-spacing: .04em;
-                     box-shadow: inset 0 0 0 3px rgba(252,217,138,.25), 0 6px 18px rgba(0,0,0,.25); text-shadow: 0 2px 6px rgba(0,0,0,.35); }
+        .gtab.on { background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+        .gtab.on .g { color: var(--c1); }
+        .gtab.on .m { color: var(--c2); }
+        /* 표지: 새벽 하늘 + 금빛 간판 */
+        .cover { position: relative; overflow: hidden; border-radius: 0 0 32px 32px; padding: 44px 22px 58px; text-align: center;
+                 background:
+                    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(255,214,140,.55), transparent 70%),
+                    radial-gradient(circle at 15% 25%, rgba(255,255,255,.55) 0 1px, transparent 2px),
+                    radial-gradient(circle at 82% 18%, rgba(255,255,255,.5) 0 1px, transparent 2px),
+                    radial-gradient(circle at 70% 60%, rgba(255,255,255,.35) 0 1px, transparent 2px),
+                    radial-gradient(circle at 28% 70%, rgba(255,255,255,.3) 0 1px, transparent 2px),
+                    linear-gradient(175deg, #1c2346 0%, #2e2f63 48%, #6a4a74 82%, #b9786a 100%); }
+        .cover::after { content: ''; position: absolute; inset: 12px 12px 14px; border: 1px solid rgba(246,211,139,.35); border-radius: 0 0 24px 24px; border-top: none; pointer-events: none; }
+        .cover .eyebrow { font-size: 10.5px; font-weight: 900; letter-spacing: .38em; color: rgba(246,211,139,.85); }
+        .cover .title { font-family: 'Gowun Batang', serif; font-weight: 700; font-size: 52px; line-height: 1.1; margin-top: 14px; letter-spacing: .02em;
+                        background: linear-gradient(180deg, #fff6dc 10%, #f3cf86 60%, #d9a24a 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+                        filter: drop-shadow(0 3px 10px rgba(0,0,0,.35)); }
+        .cover .orn { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 14px auto 0; width: 180px; }
+        .cover .orn span { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(246,211,139,.8), transparent); }
+        .cover .orn i { width: 7px; height: 7px; transform: rotate(45deg); background: #f3cf86; }
+        .cover .sub { font-family: 'Jua', sans-serif; font-size: 24px; color: #fff; margin-top: 12px; letter-spacing: .02em; }
+        .cover .date { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.72); margin-top: 6px; }
+        .cover .chip { display: inline-flex; gap: 6px; align-items: center; margin-top: 14px; padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 800;
+                       color: #fff6dc; background: rgba(255,255,255,.12); border: 1px solid rgba(246,211,139,.45); backdrop-filter: blur(4px); }
+        .cover .chip b { color: #f3cf86; font-size: 14px; }
         @media (prefers-reduced-motion: no-preference) { .pop { animation: pop .35s ease-out; } @keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } } }
     </style>
 </head>
@@ -66,16 +88,19 @@
     <!-- ───────── 홈 (한 페이지) ───────── -->
     <section id="view-home">
         <!-- 시그니처 -->
-        <header class="hero -mx-4 px-5 pt-8 pb-7 text-center rounded-b-[28px] shadow-md">
-            <div class="signboard">📖 오늘의 양식</div>
-            <h1 class="font-jua text-[30px] leading-tight text-white mt-4">계시록 통달 연습</h1>
-            <p class="text-[12px] text-amber-100/90 mt-1 break-keep">풀 때마다 새로운 10문제 · 매일 조금씩, 계시록 통달</p>
+        <header class="cover -mx-4 shadow-lg">
+            <p class="eyebrow">DAILY BREAD</p>
+            <h1 class="title">오늘의 양식</h1>
+            <div class="orn"><span></span><i></i><span></span></div>
+            <p class="sub">계시록 통달 연습</p>
+            <p class="date" id="cover-date"></p>
+            <div class="chip">매일 조금씩 · 연속 <b id="cover-streak">0</b>일</div>
         </header>
 
         <!-- 과목 · 급수 탭 -->
-        <div id="picker" class="card p-3 -mt-4 relative">
+        <div id="picker" class="card p-3 -mt-8 relative z-10">
             <div id="subject-tabs" class="grid grid-cols-3 gap-2"></div>
-            <div id="grade-tabs" class="grid grid-cols-4 gap-2 mt-3"></div>
+            <div id="grade-tabs" class="gtabs mt-3"></div>
             <p id="pick-range" class="text-[12px] font-bold text-c2 mt-3 text-center break-keep"></p>
             <div id="resume-box"></div>
             <button id="start-btn" class="w-full mt-2 py-3.5 rounded-2xl bg-grad text-white font-jua text-[19px] shadow-md">새 10문제 풀기 →</button>
@@ -83,13 +108,13 @@
 
         <!-- 안내 -->
         <div class="card p-4 mt-3 text-[12px] text-slate-600 leading-relaxed break-keep">
-            <p class="font-black text-slate-800 text-[13px] mb-1">📌 이렇게 풀어요</p>
+            <p class="font-black text-slate-800 text-[13px] mb-1">이렇게 풀어요</p>
             <ul class="space-y-0.5">
                 <li>• <b>풀 때마다 새 문제</b> — 시작할 때마다 문제은행에서 10문제를 무작위로 뽑아요. 전체 문제를 한 바퀴 다 풀 때까지 이미 나온 문제는 다시 나오지 않아요.</li>
                 <li>• 문항당 10점, 100점 만점. 띄어쓰기·문장부호는 채점에서 무시해요.</li>
                 <li>• 초중고 신학 서술형은 뜻이 맞으면 결과 화면에서 <b>“정답 인정”</b>을 누를 수 있어요.</li>
                 <li>• 답을 쓰고 <b>Enter</b>를 누르면 다음 문항으로 넘어가요.</li>
-                <li>• 채점까지 마친 날은 <b>공부한 날 달력</b>에 ✔ 표시돼요. 쓰던 답은 자동 저장되고, 기록은 이 기기에만 남아요.</li>
+                <li>• 채점까지 마친 날은 <b>공부한 날 달력</b>에 표시돼요. 쓰던 답은 자동 저장되고, 기록은 이 기기에만 남아요.</li>
             </ul>
         </div>
 
@@ -104,7 +129,7 @@
         <div class="card p-4 mt-3">
             <div class="flex items-center justify-between mb-3">
                 <button id="cal-prev" class="w-8 h-8 rounded-full hover:bg-amber-50 font-black text-amber-700" aria-label="이전 달">‹</button>
-                <p class="font-jua text-lg text-slate-800">✔ 공부한 날 · <span id="cal-title"></span></p>
+                <p class="font-jua text-lg text-slate-800">공부한 날 · <span id="cal-title"></span></p>
                 <button id="cal-next" class="w-8 h-8 rounded-full hover:bg-amber-50 font-black text-amber-700 disabled:opacity-25" aria-label="다음 달">›</button>
             </div>
             <div id="cal" class="cal"></div>
@@ -124,11 +149,11 @@
         <div class="sticky top-0 z-20 -mx-4 px-4 pt-3 pb-2 bg-[#f4f1ea]/95 backdrop-blur">
             <div class="flex items-center justify-between">
                 <button class="text-sm font-bold text-slate-500" id="exam-back">‹ 홈</button>
-                <span id="exam-timer" class="text-[12px] font-black text-slate-500">⏱ 00:00</span>
+                <span id="exam-timer" class="text-[12px] font-black text-slate-500">00:00</span>
             </div>
             <div class="mt-1 flex items-end justify-between gap-2">
                 <div>
-                    <p class="text-[11px] font-black text-amber-700">📖 오늘의 양식 · 새로 뽑은 10문제</p>
+                    <p class="text-[11px] font-black text-amber-700">오늘의 양식 · 새로 뽑은 10문제</p>
                     <h2 id="exam-title" class="font-jua text-xl text-slate-900 leading-tight"></h2>
                 </div>
                 <span id="exam-progress" class="text-[12px] font-black text-c1 whitespace-nowrap">0 / 10</span>
@@ -166,9 +191,9 @@
 'use strict';
 const DATA = window.EXAM_DATA;
 const SUBJECTS = {
-    theology: { name: '초중고 신학', short: '신학', icon: '📗' },
-    tongdal:  { name: '계시록 통달', short: '통달', icon: '📘' },
-    memo:     { name: '계시록 암기', short: '암기', icon: '📜' },
+    theology: { name: '초중고 신학', en: 'THEOLOGY' },
+    tongdal:  { name: '계시록 통달', en: 'MASTERY' },
+    memo:     { name: '계시록 암기', en: 'MEMORY' },
 };
 const SUBJECT_ORDER = ['theology', 'tongdal', 'memo'];
 const GRADES = ['grade4', 'grade3', 'grade2', 'grade1'];
@@ -347,7 +372,7 @@ function scoreBadge(score) {
 function renderHome() {
     const { s, g } = parseKey(store.sel);
     setTheme(s);
-    $('subject-tabs').innerHTML = SUBJECT_ORDER.map(k => `<button class="subj th-${k} ${k === s ? 'on' : ''}" data-subject="${k}"><div class="i">${SUBJECTS[k].icon}</div><div class="n">${SUBJECTS[k].name}</div></button>`).join('');
+    $('subject-tabs').innerHTML = SUBJECT_ORDER.map(k => `<button class="subj th-${k} ${k === s ? 'on' : ''}" data-subject="${k}"><div class="k">${SUBJECTS[k].en}</div><div class="n">${SUBJECTS[k].name}</div></button>`).join('');
     $('grade-tabs').innerHTML = GRADES.map(k => {
         const key = examKey(s, k);
         const last = store.history.find(h => h.key === key);
@@ -357,7 +382,7 @@ function renderHome() {
 
     const c = store.current;
     $('resume-box').innerHTML = c && c.key === store.sel ? `
-        <button id="resume-btn" class="w-full mt-2 py-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-800 font-black text-[13px]">✏️ 풀던 문제 이어서 풀기 (${c.answers.filter(a => a.every(x => String(x).trim())).length}/${c.exam.questions.length} 작성)</button>` : '';
+        <button id="resume-btn" class="w-full mt-2 py-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-800 font-black text-[13px]">풀던 문제 이어서 풀기 (${c.answers.filter(a => a.every(x => String(x).trim())).length}/${c.exam.questions.length} 작성)</button>` : '';
     $('start-btn').textContent = c && c.key === store.sel ? '새 10문제로 다시 시작 →' : '새 10문제 풀기 →';
 
     // 통계
@@ -369,19 +394,21 @@ function renderHome() {
     let streak = 0, d = days.has(today) ? today : addDays(today, -1);
     while (days.has(d)) { streak++; d = addDays(d, -1); }
     $('stat-streak').textContent = streak;
+    $('cover-streak').textContent = streak;
+    { const t = new Date(Date.now() + 9 * 3600e3); $('cover-date').textContent = `${t.getUTCFullYear()}. ${t.getUTCMonth() + 1}. ${t.getUTCDate()}. ${'일월화수목금토'[t.getUTCDay()]}요일`; }
     renderCalendar(days);
 
     $('history-count').textContent = h.length ? `최근 ${Math.min(h.length, 15)}개` : '';
     $('history').innerHTML = h.length ? h.slice(0, 15).map((r, i) => {
         const ps = parseKey(r.key).s;
         return `<button class="w-full flex items-center gap-3 px-4 py-3 text-left" data-review="${i}">
-            <span class="text-lg">${SUBJECTS[ps].icon}</span>
+            <span class="th-${ps} w-1.5 h-9 rounded-full bg-c1 shrink-0"></span>
             <div class="flex-1 min-w-0"><p class="text-[14px] font-black text-slate-800">${esc(examName(r.key))}</p><p class="text-[11px] text-slate-400">${fmtWhen(r.at)} · ${r.full}/${r.exam.questions.length}문항 정답</p></div>
             ${scoreBadge(r.score)}<span class="text-slate-300 font-black">›</span>
         </button>`; }).join('')
         : '<p class="p-5 text-center text-[13px] text-slate-400">아직 기록이 없어요. 위에서 과목을 고르고 시작해보세요!</p>';
 }
-// 공부한 날 달력 (한 문제라도 채점까지 마친 날에 ✔)
+// 공부한 날 달력 (채점까지 마친 날 표시)
 let calMonth = kstDate(Date.now()).slice(0, 7);
 function renderCalendar(days) {
     const today = kstDate(Date.now());
@@ -432,11 +459,11 @@ function resumeExam() { store.current.startedAt = Date.now() - (store.current.el
 function openExam() {
     const c = store.current, { s } = parseKey(c.key);
     $('exam-title').textContent = `${examName(c.key)} 연습 시험`;
-    $('exam-range').textContent = `📚 출제 범위: ${c.exam.range}`;
+    $('exam-range').textContent = `출제 범위: ${c.exam.range}`;
     $('exam-list').innerHTML = c.exam.questions.map((q, i) => renderQuestion(q, i, c.answers[i])).join('');
     updateProgress();
     clearInterval(timerHandle);
-    const tick = () => { const sec = Math.floor((Date.now() - c.startedAt) / 1000); $('exam-timer').textContent = `⏱ ${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`; };
+    const tick = () => { const sec = Math.floor((Date.now() - c.startedAt) / 1000); $('exam-timer').textContent = `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`; };
     tick(); timerHandle = setInterval(tick, 1000);
     show('exam');
     setTheme(s);
@@ -526,7 +553,7 @@ $('exam-submit').onclick = () => {
 let shown = null;
 function showResult(rec) {
     shown = rec;
-    $('res-date').textContent = `📖 오늘의 양식 · ${fmtWhen(rec.at)}`;
+    $('res-date').textContent = `오늘의 양식 · ${fmtWhen(rec.at)}`;
     $('res-title').textContent = examName(rec.key);
     $('res-wrong-only').checked = false;
     renderResultBody();
@@ -550,7 +577,7 @@ function renderResultBody() {
     const sec = Math.round((rec.elapsed || 0) / 1000);
     $('res-score').textContent = rec.score;
     $('res-sub').textContent = `${exam.questions.length}문항 중 ${rec.full}문항 정답 · 걸린 시간 ${Math.floor(sec / 60)}분 ${sec % 60}초`;
-    $('res-msg').textContent = '매일 조금씩, 계시록 통달 ✔';
+    $('res-msg').textContent = '매일 조금씩, 계시록 통달';
     const wrongOnly = $('res-wrong-only').checked;
     const html = exam.questions.map((q, i) => {
         const r = rec.results[i], ok = isOk(i);
@@ -575,14 +602,14 @@ function renderResultBody() {
                 </div>`).join('') +
                 (q.x ? `<details class="mt-2"><summary class="text-[12px] font-bold text-c1 cursor-pointer">해설 보기</summary><p class="text-[13px] text-slate-600 mt-1 leading-relaxed break-keep">${nl2br(q.x)}</p></details>` : '');
             // 서술형은 자동 채점이 완벽할 수 없으므로, 뜻이 맞으면 본인이 정답으로 인정할 수 있게 한다
-            if (!r.every(Boolean)) body += `<button class="mt-2 text-[12px] font-black px-3 py-1.5 rounded-lg ${rec.overrides[i] ? 'bg-emerald-600 text-white' : 'bg-white border border-slate-300 text-slate-600'}" data-override="${i}">${rec.overrides[i] ? '✔ 정답으로 인정함 (취소)' : '내 답도 뜻이 맞아요 → 정답 인정'}</button>`;
+            if (!r.every(Boolean)) body += `<button class="mt-2 text-[12px] font-black px-3 py-1.5 rounded-lg ${rec.overrides[i] ? 'bg-emerald-600 text-white' : 'bg-white border border-slate-300 text-slate-600'}" data-override="${i}">${rec.overrides[i] ? '정답으로 인정함 (취소)' : '내 답도 뜻이 맞아요 → 정답 인정'}</button>`;
         }
         const pts = Math.round(qPoints(rec, i) * 10) / 10;
         return `<div class="card p-4 ${ok ? '' : 'wrong'}">
-            <div class="flex items-center justify-between mb-2">${qHeader(q, i)}<span class="font-jua text-lg ${ok ? 'text-emerald-600' : 'text-rose-500'}">${ok ? '⭕' : '❌'} ${pts}점</span></div>
+            <div class="flex items-center justify-between mb-2">${qHeader(q, i)}<span class="pill ${ok ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}" style="font-size:12px">${ok ? '정답' : '오답'} · ${pts}점</span></div>
             ${body}</div>`;
     }).join('');
-    $('res-list').innerHTML = html || '<p class="card p-5 text-center text-slate-500 font-bold">틀린 문제가 없어요! 🎉</p>';
+    $('res-list').innerHTML = html || '<p class="card p-5 text-center text-slate-500 font-bold">틀린 문제가 없어요!</p>';
 }
 $('res-wrong-only').onchange = renderResultBody;
 $('res-list').addEventListener('click', e => {
@@ -594,7 +621,7 @@ $('res-list').addEventListener('click', e => {
 $('res-retry').onclick = () => { store.sel = shown.key; startExam(shown.key); };
 $('res-home').onclick = () => show('home');
 $('res-share').onclick = async () => {
-    const text = `📖 오늘의 양식 · 계시록 통달 자격증 연습 시험\n${examName(shown.key)} ${shown.score}점 (${shown.full}/${shown.exam.questions.length}문항 정답) ✍️`;
+    const text = `오늘의 양식 · 계시록 통달 연습\n${examName(shown.key)} ${shown.score}점 (${shown.full}/${shown.exam.questions.length}문항 정답)`;
     try {
         if (navigator.share) await navigator.share({ text });
         else { await navigator.clipboard.writeText(text); toast('결과가 복사됐어요. 단톡방에 붙여넣기 하세요'); }
