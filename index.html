@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>오늘의 양식 · 계시록 통달 연습</title>
+    <meta name="description" content="초중고 신학 · 계시록 통달 · 계시록 암기 1~4급, 풀 때마다 새로 나오는 10문항 연습 시험">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="data.js"></script>
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background: #f4f1ea; -webkit-tap-highlight-color: transparent; }
+        .font-jua { font-family: 'Jua', sans-serif; }
+        .break-keep { word-break: keep-all; }
+        .hidden { display: none !important; }
+        /* 과목별 색 — 신학=초록, 통달=남색, 암기=자주 */
+        .th-theology { --c1: #059669; --c2: #047857; --soft: #ecfdf5; --line: #a7f3d0; }
+        .th-tongdal  { --c1: #5c6bc0; --c2: #3949ab; --soft: #eef2ff; --line: #c7d2fe; }
+        .th-memo     { --c1: #c026d3; --c2: #a21caf; --soft: #fdf4ff; --line: #f5d0fe; }
+        .bg-c1 { background: var(--c1); } .text-c1 { color: var(--c1); } .text-c2 { color: var(--c2); }
+        .bg-soft { background: var(--soft); } .border-line { border-color: var(--line); }
+        .bg-grad { background: linear-gradient(135deg, var(--c1), var(--c2)); }
+        .blank { display: inline-block; min-width: 4.5rem; max-width: 100%; border: none; border-bottom: 2px solid var(--c1); background: var(--soft);
+                 padding: 1px 6px; margin: 2px 2px; border-radius: 6px 6px 0 0; font-weight: 700; color: #1e1b4b; font-size: 15px; outline: none; line-height: 1.6; }
+        .blank:focus { background: #fff7cc; }
+        .blank.ok { border-color: #16a34a; background: #dcfce7; color: #166534; }
+        .blank.ng { border-color: #dc2626; background: #fee2e2; color: #991b1b; text-decoration: line-through; }
+        textarea.ans { width: 100%; border: 2px solid #e2e8f0; border-radius: 12px; padding: 10px 12px; font-size: 15px; resize: vertical; outline: none; background: #fff; }
+        textarea.ans:focus { border-color: var(--c1); }
+        .diff-ng { color: #dc2626; font-weight: 800; text-decoration: underline; }
+        .card { background: #fff; border-radius: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.06); border: 1px solid #ece7dc; }
+        .card.wrong { border-color: #fecdd3; }
+        .pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; padding: 2px 9px; border-radius: 999px; }
+        /* 홈 탭 */
+        /* 과목 탭: 세 과목이 한눈에 보이도록 큼직하게 */
+        .subj { border-radius: 16px; padding: 12px 4px 10px; border: 2px solid #ece7dc; background: #faf8f3; transition: all .15s; text-align: center; }
+        .subj .i { font-size: 26px; line-height: 1; }
+        .subj .n { font-family: 'Jua', sans-serif; font-size: 17px; color: #57534e; margin-top: 6px; white-space: nowrap; }
+        .subj.on { border-color: var(--c1); background: var(--soft); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+        .subj.on .n { color: var(--c2); }
+        /* 공부한 날 달력 */
+        .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+        .cal .w { font-size: 10px; font-weight: 800; color: #a8a29e; padding-bottom: 2px; }
+        .cal .d { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 12px; font-weight: 700; color: #78716c; position: relative; }
+        .cal .d.done { background: #b45309; color: #fff; }
+        .cal .d.done::after { content: '✔'; position: absolute; right: 2px; top: 0; font-size: 9px; color: #fde68a; }
+        .cal .d.today { outline: 2px solid #f59e0b; outline-offset: -2px; }
+        .cal .d.future { color: #d6d3d1; }
+        .gtab { border-radius: 12px; padding: 7px 0 6px; border: 2px solid var(--line); background: #fff; transition: all .15s; }
+        .gtab .g { font-family: 'Jua', sans-serif; font-size: 17px; color: var(--c1); line-height: 1.1; }
+        .gtab .m { font-size: 10px; font-weight: 800; color: #a8a29e; }
+        .gtab.on { background: linear-gradient(135deg, var(--c1), var(--c2)); border-color: transparent; }
+        .gtab.on .g, .gtab.on .m { color: #fff; }
+        .hero { background: linear-gradient(160deg, #3b2f1e 0%, #6b4f2a 55%, #a8813f 100%); }
+        .signboard { display: inline-block; font-family: 'Jua', sans-serif; font-size: 44px; line-height: 1; color: #fff7e0; padding: 14px 26px 12px;
+                     border: 3px solid #fcd98a; border-radius: 18px; background: rgba(0,0,0,.18); letter-spacing: .04em;
+                     box-shadow: inset 0 0 0 3px rgba(252,217,138,.25), 0 6px 18px rgba(0,0,0,.25); text-shadow: 0 2px 6px rgba(0,0,0,.35); }
+        @media (prefers-reduced-motion: no-preference) { .pop { animation: pop .35s ease-out; } @keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } } }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800">
+<div id="app" class="max-w-xl mx-auto px-4 pb-24">
+
+    <!-- ───────── 홈 (한 페이지) ───────── -->
+    <section id="view-home">
+        <!-- 시그니처 -->
+        <header class="hero -mx-4 px-5 pt-8 pb-7 text-center rounded-b-[28px] shadow-md">
+            <div class="signboard">📖 오늘의 양식</div>
+            <h1 class="font-jua text-[30px] leading-tight text-white mt-4">계시록 통달 연습</h1>
+            <p class="text-[12px] text-amber-100/90 mt-1 break-keep">풀 때마다 새로운 10문제 · 매일 조금씩, 계시록 통달</p>
+        </header>
+
+        <!-- 과목 · 급수 탭 -->
+        <div id="picker" class="card p-3 -mt-4 relative">
+            <div id="subject-tabs" class="grid grid-cols-3 gap-2"></div>
+            <div id="grade-tabs" class="grid grid-cols-4 gap-2 mt-3"></div>
+            <p id="pick-range" class="text-[12px] font-bold text-c2 mt-3 text-center break-keep"></p>
+            <div id="resume-box"></div>
+            <button id="start-btn" class="w-full mt-2 py-3.5 rounded-2xl bg-grad text-white font-jua text-[19px] shadow-md">새 10문제 풀기 →</button>
+        </div>
+
+        <!-- 안내 -->
+        <div class="card p-4 mt-3 text-[12px] text-slate-600 leading-relaxed break-keep">
+            <p class="font-black text-slate-800 text-[13px] mb-1">📌 이렇게 풀어요</p>
+            <ul class="space-y-0.5">
+                <li>• <b>풀 때마다 새 문제</b> — 시작할 때마다 문제은행에서 10문제를 무작위로 뽑아요. 전체 문제를 한 바퀴 다 풀 때까지 이미 나온 문제는 다시 나오지 않아요.</li>
+                <li>• 문항당 10점, 100점 만점. 띄어쓰기·문장부호는 채점에서 무시해요.</li>
+                <li>• 초중고 신학 서술형은 뜻이 맞으면 결과 화면에서 <b>“정답 인정”</b>을 누를 수 있어요.</li>
+                <li>• 답을 쓰고 <b>Enter</b>를 누르면 다음 문항으로 넘어가요.</li>
+                <li>• 채점까지 마친 날은 <b>공부한 날 달력</b>에 ✔ 표시돼요. 쓰던 답은 자동 저장되고, 기록은 이 기기에만 남아요.</li>
+            </ul>
+        </div>
+
+        <!-- 통계 -->
+        <div class="grid grid-cols-3 gap-2 mt-3">
+            <div class="card py-2.5 text-center"><p class="text-[10px] font-bold text-slate-500">연속 학습</p><p class="font-jua text-xl text-amber-600"><span id="stat-streak">0</span>일</p></div>
+            <div class="card py-2.5 text-center"><p class="text-[10px] font-bold text-slate-500">푼 횟수</p><p class="font-jua text-xl text-slate-800"><span id="stat-count">0</span>회</p></div>
+            <div class="card py-2.5 text-center"><p class="text-[10px] font-bold text-slate-500">평균 점수</p><p class="font-jua text-xl text-slate-800"><span id="stat-avg">-</span></p></div>
+        </div>
+
+        <!-- 공부한 날 -->
+        <div class="card p-4 mt-3">
+            <div class="flex items-center justify-between mb-3">
+                <button id="cal-prev" class="w-8 h-8 rounded-full hover:bg-amber-50 font-black text-amber-700" aria-label="이전 달">‹</button>
+                <p class="font-jua text-lg text-slate-800">✔ 공부한 날 · <span id="cal-title"></span></p>
+                <button id="cal-next" class="w-8 h-8 rounded-full hover:bg-amber-50 font-black text-amber-700 disabled:opacity-25" aria-label="다음 달">›</button>
+            </div>
+            <div id="cal" class="cal"></div>
+            <p id="cal-sum" class="text-[11px] text-slate-500 mt-2 text-center"></p>
+        </div>
+
+        <!-- 최근 기록 -->
+        <div class="flex items-center justify-between mt-6 mb-2">
+            <h2 class="font-jua text-lg text-slate-800">최근 기록</h2>
+            <span id="history-count" class="text-[11px] font-bold text-slate-400"></span>
+        </div>
+        <div id="history" class="card divide-y divide-slate-100"></div>
+    </section>
+
+    <!-- ───────── 시험지 ───────── -->
+    <section id="view-exam" class="hidden">
+        <div class="sticky top-0 z-20 -mx-4 px-4 pt-3 pb-2 bg-[#f4f1ea]/95 backdrop-blur">
+            <div class="flex items-center justify-between">
+                <button class="text-sm font-bold text-slate-500" id="exam-back">‹ 홈</button>
+                <span id="exam-timer" class="text-[12px] font-black text-slate-500">⏱ 00:00</span>
+            </div>
+            <div class="mt-1 flex items-end justify-between gap-2">
+                <div>
+                    <p class="text-[11px] font-black text-amber-700">📖 오늘의 양식 · 새로 뽑은 10문제</p>
+                    <h2 id="exam-title" class="font-jua text-xl text-slate-900 leading-tight"></h2>
+                </div>
+                <span id="exam-progress" class="text-[12px] font-black text-c1 whitespace-nowrap">0 / 10</span>
+            </div>
+            <div class="h-1.5 bg-white rounded-full mt-2 overflow-hidden"><div id="exam-bar" class="h-full bg-c1 rounded-full transition-all" style="width:0%"></div></div>
+        </div>
+        <div id="exam-range" class="card bg-soft border-line p-3 mt-3 text-[12px] font-bold text-c2 break-keep"></div>
+        <div id="exam-list" class="space-y-3 mt-3"></div>
+        <button id="exam-submit" class="w-full mt-5 py-4 rounded-2xl bg-grad text-white font-jua text-xl shadow-lg">채점하기</button>
+        <p class="text-center text-[11px] text-slate-400 mt-2">쓰고 Enter → 다음 문항 · 문항당 10점 · 띄어쓰기와 문장부호는 채점에서 무시합니다</p>
+    </section>
+
+    <!-- ───────── 결과 ───────── -->
+    <section id="view-result" class="hidden pt-5">
+        <div class="card p-5 text-center relative overflow-hidden">
+            <p id="res-date" class="text-[12px] font-black text-amber-700"></p>
+            <p id="res-title" class="text-[13px] font-black text-slate-500 mt-0.5"></p>
+            <div class="mt-3 flex items-end justify-center gap-1 pop"><span id="res-score" class="font-jua text-6xl text-c1">0</span><span class="font-jua text-2xl text-slate-400 mb-2">점</span></div>
+            <p id="res-sub" class="text-[13px] font-bold text-slate-600 mt-1"></p>
+            <p id="res-msg" class="font-jua text-[16px] text-amber-700 mt-2"></p>
+            <div class="grid grid-cols-3 gap-2 mt-4">
+                <button id="res-retry" class="py-3 rounded-xl bg-grad font-black text-[13px] text-white">새 10문제</button>
+                <button id="res-share" class="py-3 rounded-xl bg-amber-100 font-black text-[13px] text-amber-800">결과 공유</button>
+                <button id="res-home" class="py-3 rounded-xl bg-slate-100 font-black text-[13px] text-slate-700">홈으로</button>
+            </div>
+        </div>
+        <label class="flex items-center gap-2 mt-4 mb-2 text-[13px] font-bold text-slate-600"><input type="checkbox" id="res-wrong-only" class="w-4 h-4"> 틀린 문제만 보기</label>
+        <div id="res-list" class="space-y-3"></div>
+    </section>
+
+    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg z-50"></div>
+</div>
+
+<script>
+'use strict';
+const DATA = window.EXAM_DATA;
+const SUBJECTS = {
+    theology: { name: '초중고 신학', short: '신학', icon: '📗' },
+    tongdal:  { name: '계시록 통달', short: '통달', icon: '📘' },
+    memo:     { name: '계시록 암기', short: '암기', icon: '📜' },
+};
+const SUBJECT_ORDER = ['theology', 'tongdal', 'memo'];
+const GRADES = ['grade4', 'grade3', 'grade2', 'grade1'];
+const gradeLabel = g => g.replace('grade', '') + '급';
+const examKey = (s, g) => s + '-' + g;
+const parseKey = k => { const [s, g] = k.split('-'); return { s, g }; };
+const examName = k => { const { s, g } = parseKey(k); return `${SUBJECTS[s].name} ${gradeLabel(g)}`; };
+const rangeOf = k => { const { s, g } = parseKey(k); return s === 'memo' ? DATA.memo.grades[g].rangeLabel : DATA[s][g].range; };
+const QN = 10;
+const HISTORY_MAX = 60;
+
+// ───────── 저장소 (이 기기 localStorage) ─────────
+const STORE_KEY = 'tongdal_practice_v2';
+function loadStore() {
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) {}
+    s = s && typeof s === 'object' ? s : {};
+    return { sel: s.sel || 'tongdal-grade4', seen: s.seen || {}, history: Array.isArray(s.history) ? s.history : [], current: s.current || null };
+}
+function saveStore() { try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e) {} }
+const store = loadStore();
+
+// ───────── 날짜 (한국 시간) ─────────
+const kstDate = ts => new Date(ts + 9 * 3600e3).toISOString().slice(0, 10);
+function addDays(d, n) { const t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); }
+function fmtWhen(ts) {
+    const d = kstDate(ts), t = new Date(ts + 9 * 3600e3);
+    const today = kstDate(Date.now());
+    const day = d === today ? '오늘' : d === addDays(today, -1) ? '어제' : `${t.getUTCMonth() + 1}/${t.getUTCDate()}`;
+    return `${day} ${String(t.getUTCHours()).padStart(2, '0')}:${String(t.getUTCMinutes()).padStart(2, '0')}`;
+}
+
+// ───────── 무작위 출제 (시도할 때마다 새 문제) ─────────
+function shuffled(arr) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function randInt(min, max) { return min + Math.floor(Math.random() * (max - min + 1)); }
+// 이미 나온 문제는 문제은행을 한 바퀴 다 돌 때까지 제외 → 모자라면 그 구간 기록을 비우고 새 바퀴 시작
+function pickFresh(items, count, seenKey, idOf) {
+    if (count <= 0 || !items.length) return [];
+    let seen = new Set(store.seen[seenKey] || []);
+    let pool = items.map((it, i) => i).filter(i => !seen.has(idOf(items[i])));
+    let picked;
+    if (pool.length >= count) picked = shuffled(pool).slice(0, count);
+    else {
+        // 남은 문제를 먼저 다 쓰고, 부족한 만큼은 새 바퀴에서 채운다
+        const rest = new Set(pool);
+        picked = pool.concat(shuffled(items.map((_, i) => i).filter(i => !rest.has(i))).slice(0, count - pool.length));
+        seen = new Set();
+    }
+    picked.forEach(i => seen.add(idOf(items[i])));
+    store.seen[seenKey] = [...seen];
+    return picked.sort((a, b) => a - b).map(i => items[i]);
+}
+
+// ───────── 문제 만들기 ─────────
+const splitParts = a => String(a).split(/\n(?=[①-⑩])/).map(x => x.trim());
+const stripCircle = s => s.replace(/^[①-⑩]\s*/, '');
+
+function buildExam(key) {
+    const { s, g } = parseKey(key);
+    if (s === 'memo') return buildMemo(g);
+    const def = DATA[s][g];
+    const qs = [];
+    def.groups.forEach(gr => {
+        const idOf = s === 'theology' ? it => it.q + '|' + it.a : it => it.ch + '|' + it.v + '|' + it.q + '|' + it.t;
+        pickFresh(gr.items, gr.count, key + '|' + gr.label, idOf).forEach(it => {
+            if (s === 'theology') qs.push({ type: 'th', kind: gr.kind, label: gr.label, q: it.q, x: it.x || '', parts: splitParts(it.a) });
+            else qs.push({ type: 'td', ch: it.ch, v: it.v, q: it.q, t: it.t, r: it.r, parts: [...it.t.matchAll(/\{\{(.*?)\}\}/g)].map(m => m[1]) });
+        });
+    });
+    saveStore();
+    return { range: def.range, questions: qs };
+}
+
+function memoTopCandidates(maxCh) {
+    const list = [];
+    for (let ch = 1; ch <= maxCh; ch++) {
+        const spec = DATA.memo.top[ch]; if (!spec) continue;
+        const vc = Object.keys(DATA.verses['ch' + ch]).length;
+        spec.split(',').forEach(part => {
+            const [a, b] = part.split('-').map(Number);
+            for (let v = a; v <= (b || a); v++) if (v >= 1 && v <= vc) list.push({ ch, v });
+        });
+    }
+    return list;
+}
+// 원본 계시록 암기 모의고사와 같은 방식(난이도별 어절 수 괄호 + 최상 난이도 구절 전체 쓰기)을 10문항으로 축소.
+// 괄호 넣기 절도 한 바퀴 돌 때까지 같은 절이 다시 안 나오도록 pickFresh 로 고른다.
+function buildMemo(g) {
+    const key = 'memo-' + g;
+    const cfg = DATA.memo.grades[g];
+    const all = [];
+    for (let ch = 1; ch <= cfg.maxCh; ch++) Object.keys(DATA.verses['ch' + ch]).forEach(v => {
+        const text = DATA.verses['ch' + ch][v].trim();
+        if (text.split(/\s+/).length >= 2) all.push({ ch, v: Number(v), text });
+    });
+    const blankCount = QN - cfg.topCount;
+    const verses = shuffled(pickFresh(all, blankCount, key + '|blank', it => it.ch + ':' + it.v));
+    // 난이도: 상(9~20어절) 1 · 중(3~8어절) 3 · 하(1~2어절) 나머지
+    const tiers = [{ min: 9, max: 20 }, { min: 3, max: 8 }, { min: 3, max: 8 }, { min: 3, max: 8 }];
+    const qs = verses.map((vObj, i) => {
+        const t = tiers[i] || { min: 1, max: 2 };
+        const tokens = vObj.text.split(/\s+/);
+        const maxLen = Math.min(t.max, tokens.length - 1), minLen = Math.min(t.min, maxLen);
+        const len = randInt(minLen, maxLen), start = randInt(0, tokens.length - len);
+        return { type: 'mb', ch: vObj.ch, v: vObj.v, before: tokens.slice(0, start).join(' '), after: tokens.slice(start + len).join(' '), parts: [tokens.slice(start, start + len).join(' ')] };
+    }).sort((a, b) => a.ch - b.ch || a.v - b.v);
+    const used = new Set(qs.map(q => q.ch + ':' + q.v));
+    pickFresh(memoTopCandidates(cfg.maxCh).filter(c => !used.has(c.ch + ':' + c.v)), cfg.topCount, key + '|verse', c => c.ch + ':' + c.v)
+        .forEach(({ ch, v }) => qs.push({ type: 'mv', ch, v, parts: [DATA.verses['ch' + ch][v].trim()] }));
+    saveStore();
+    return { range: cfg.rangeLabel + ' · 괄호 넣기 ' + blankCount + '문항 + 구절 전체 쓰기 ' + cfg.topCount + '문항', questions: qs };
+}
+
+// ───────── 채점 ─────────
+const norm = s => String(s || '').normalize('NFC').replace(/[^0-9A-Za-z가-힣]/g, '').toLowerCase();
+// 개역한글판 옛 표기 관용
+const SPELLING = [[/찌/g, '지'], [/세째/g, '셋째'], [/네째/g, '넷째'], [/앎으로/g, '알므로'], [/자주빛/g, '자줏빛'], [/잠간/g, '잠깐'], [/륙/g, '육'], [/써/g, '서'], [/우레/g, '우뢰'], [/비췸/g, '비침'], [/쌔/g, '새'], [/찐/g, '진'], [/두째/g, '둘째']];
+const spell = s => SPELLING.reduce((t, [re, to]) => t.replace(re, to), s);
+const SYN = [['사단', '마귀', '귀신'], ['어린양', '예수님']];
+const syn = s => SYN.reduce((t, grp) => grp.slice(1).reduce((u, w) => u.split(w).join(grp[0]), t), s);
+const PARTICLES = ['은', '는', '이', '가', '을', '를', '도', '의', '들'];
+const noParticle = s => (s.length > 1 && PARTICLES.includes(s[s.length - 1])) ? s.slice(0, -1) : s;
+const noUnit = s => s.replace(/(\d)명$/, '$1');
+
+function matchTongdal(u, a) {
+    const un = norm(u), an = norm(a); if (!un) return false;
+    if (un === an) return true;
+    const up = noParticle(un);
+    return up === an || syn(up) === syn(an) || noUnit(un) === noUnit(an) || noUnit(up) === noUnit(an) || spell(un) === spell(an) || spell(up) === spell(an);
+}
+function matchMemo(u, a) { const un = spell(norm(u)); return !!un && un === spell(norm(a)); }
+// 신학 서술형: 핵심 어구의 80% 이상이 들어 있으면 정답 (괄호 속 성구·※ 보충설명은 채점에서 제외)
+function matchTheology(u, a) {
+    const un = norm(u); if (!un) return false;
+    const core = stripCircle(a).split('※')[0];
+    if (un === norm(core)) return true;
+    const toks = core.replace(/\([^)]*\)/g, ' ').split(/[\s,·/]+/).map(norm).filter(Boolean);
+    if (!toks.length) return false;
+    return toks.filter(t => un.includes(t)).length / toks.length >= 0.8;
+}
+function gradeQuestion(q, answers) {
+    const m = q.type === 'th' ? matchTheology : q.type === 'td' ? matchTongdal : matchMemo;
+    return q.parts.map((p, i) => m(answers[i], p));
+}
+// 문항당 10점. 빈칸/소문항이 여러 개면 맞힌 비율만큼 부분 점수. "정답 인정"한 문항은 10점.
+function qPoints(rec, i) { return rec.overrides[i] ? 10 : 10 * rec.results[i].filter(Boolean).length / rec.results[i].length; }
+function calcScore(rec) { return Math.round(rec.results.reduce((s, _, i) => s + qPoints(rec, i), 0) * 10 / rec.results.length); }
+
+// ───────── 화면 공통 ─────────
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nl2br = s => esc(s).replace(/\n/g, '<br>');
+function show(view) {
+    if (view === 'home') renderHome();
+    ['home', 'exam', 'result'].forEach(v => $('view-' + v).classList.toggle('hidden', v !== view));
+    window.scrollTo(0, 0);
+}
+function setTheme(s) { $('app').className = 'max-w-xl mx-auto px-4 pb-24 th-' + s; }
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(toast._h); toast._h = setTimeout(() => t.classList.add('hidden'), 1800); }
+function memoWordDiff(correct, user) { // 구절 쓰기: 틀리거나 빠진 어절 표시
+    const cW = correct.split(/\s+/), uW = String(user || '').trim().split(/\s+/).filter(Boolean);
+    const cN = cW.map(w => spell(norm(w))), uN = uW.map(w => spell(norm(w)));
+    const n = cN.length, m = uN.length, dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) dp[i][j] = cN[i] === uN[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    const out = []; let i = 0, j = 0;
+    while (i < n && j < m) { if (cN[i] === uN[j]) { out.push([cW[i], 1]); i++; j++; } else if (dp[i + 1][j] >= dp[i][j + 1]) { out.push([cW[i], 0]); i++; } else j++; }
+    while (i < n) out.push([cW[i++], 0]);
+    return out.map(([w, ok]) => ok ? esc(w) : `<span class="diff-ng">${esc(w)}</span>`).join(' ');
+}
+function scoreBadge(score) {
+    const c = score >= 80 ? 'bg-emerald-100 text-emerald-700' : score >= 60 ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700';
+    return `<span class="pill ${c}">${score}점</span>`;
+}
+
+// ───────── 홈 ─────────
+function renderHome() {
+    const { s, g } = parseKey(store.sel);
+    setTheme(s);
+    $('subject-tabs').innerHTML = SUBJECT_ORDER.map(k => `<button class="subj th-${k} ${k === s ? 'on' : ''}" data-subject="${k}"><div class="i">${SUBJECTS[k].icon}</div><div class="n">${SUBJECTS[k].name}</div></button>`).join('');
+    $('grade-tabs').innerHTML = GRADES.map(k => {
+        const key = examKey(s, k);
+        const last = store.history.find(h => h.key === key);
+        return `<button class="gtab ${k === g ? 'on' : ''}" data-grade="${k}"><div class="g">${gradeLabel(k)}</div><div class="m">${last ? '최근 ' + last.score + '점' : '10문항'}</div></button>`;
+    }).join('');
+    $('pick-range').textContent = `출제 범위: ${rangeOf(store.sel)}`;
+
+    const c = store.current;
+    $('resume-box').innerHTML = c && c.key === store.sel ? `
+        <button id="resume-btn" class="w-full mt-2 py-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-800 font-black text-[13px]">✏️ 풀던 문제 이어서 풀기 (${c.answers.filter(a => a.every(x => String(x).trim())).length}/${c.exam.questions.length} 작성)</button>` : '';
+    $('start-btn').textContent = c && c.key === store.sel ? '새 10문제로 다시 시작 →' : '새 10문제 풀기 →';
+
+    // 통계
+    const h = store.history;
+    $('stat-count').textContent = h.length;
+    $('stat-avg').textContent = h.length ? Math.round(h.reduce((a, r) => a + r.score, 0) / h.length) + '점' : '-';
+    const days = new Set(h.map(r => kstDate(r.at)));
+    const today = kstDate(Date.now());
+    let streak = 0, d = days.has(today) ? today : addDays(today, -1);
+    while (days.has(d)) { streak++; d = addDays(d, -1); }
+    $('stat-streak').textContent = streak;
+    renderCalendar(days);
+
+    $('history-count').textContent = h.length ? `최근 ${Math.min(h.length, 15)}개` : '';
+    $('history').innerHTML = h.length ? h.slice(0, 15).map((r, i) => {
+        const ps = parseKey(r.key).s;
+        return `<button class="w-full flex items-center gap-3 px-4 py-3 text-left" data-review="${i}">
+            <span class="text-lg">${SUBJECTS[ps].icon}</span>
+            <div class="flex-1 min-w-0"><p class="text-[14px] font-black text-slate-800">${esc(examName(r.key))}</p><p class="text-[11px] text-slate-400">${fmtWhen(r.at)} · ${r.full}/${r.exam.questions.length}문항 정답</p></div>
+            ${scoreBadge(r.score)}<span class="text-slate-300 font-black">›</span>
+        </button>`; }).join('')
+        : '<p class="p-5 text-center text-[13px] text-slate-400">아직 기록이 없어요. 위에서 과목을 고르고 시작해보세요!</p>';
+}
+// 공부한 날 달력 (한 문제라도 채점까지 마친 날에 ✔)
+let calMonth = kstDate(Date.now()).slice(0, 7);
+function renderCalendar(days) {
+    const today = kstDate(Date.now());
+    const [y, m] = calMonth.split('-').map(Number);
+    const first = new Date(Date.UTC(y, m - 1, 1)).getUTCDay();
+    const last = new Date(Date.UTC(y, m, 0)).getUTCDate();
+    $('cal-title').textContent = `${y}년 ${m}월`;
+    $('cal-next').disabled = calMonth >= today.slice(0, 7);
+    let html = '일월화수목금토'.split('').map(w => `<div class="w">${w}</div>`).join('');
+    html += '<div></div>'.repeat(first);
+    let cnt = 0;
+    for (let d = 1; d <= last; d++) {
+        const ds = `${calMonth}-${String(d).padStart(2, '0')}`;
+        const done = days.has(ds); if (done) cnt++;
+        html += `<div class="d ${done ? 'done' : ''} ${ds === today ? 'today' : ''} ${ds > today ? 'future' : ''}">${d}</div>`;
+    }
+    $('cal').innerHTML = html;
+    $('cal-sum').textContent = `이번 달 공부한 날 ${cnt}일`;
+}
+function shiftMonth(n) { const [y, m] = calMonth.split('-').map(Number); const t = new Date(Date.UTC(y, m - 1 + n, 1)); calMonth = t.toISOString().slice(0, 7); renderHome(); }
+$('cal-prev').onclick = () => shiftMonth(-1);
+$('cal-next').onclick = () => shiftMonth(1);
+
+document.addEventListener('click', e => {
+    const sb = e.target.closest('[data-subject]');
+    if (sb) { store.sel = examKey(sb.dataset.subject, parseKey(store.sel).g); saveStore(); renderHome(); return; }
+    const gb = e.target.closest('[data-grade]');
+    if (gb) { store.sel = examKey(parseKey(store.sel).s, gb.dataset.grade); saveStore(); renderHome(); return; }
+    if (e.target.closest('#resume-btn')) { resumeExam(); return; }
+    const rv = e.target.closest('[data-review]');
+    if (rv) { const r = store.history[+rv.dataset.review]; if (r) showResult(r); }
+});
+$('start-btn').onclick = () => {
+    const c = store.current;
+    if (c && c.key === store.sel && c.answers.some(a => a.some(x => String(x).trim())) && !confirm('풀던 문제가 있어요. 버리고 새 10문제로 시작할까요?')) return;
+    startExam(store.sel);
+};
+
+// ───────── 시험 ─────────
+let timerHandle = null;
+function startExam(key) {
+    const exam = buildExam(key);
+    store.current = { key, exam, answers: exam.questions.map(q => q.parts.map(() => '')), startedAt: Date.now() };
+    saveStore();
+    openExam();
+}
+function resumeExam() { store.current.startedAt = Date.now() - (store.current.elapsed || 0); openExam(); }
+function openExam() {
+    const c = store.current, { s } = parseKey(c.key);
+    $('exam-title').textContent = `${examName(c.key)} 연습 시험`;
+    $('exam-range').textContent = `📚 출제 범위: ${c.exam.range}`;
+    $('exam-list').innerHTML = c.exam.questions.map((q, i) => renderQuestion(q, i, c.answers[i])).join('');
+    updateProgress();
+    clearInterval(timerHandle);
+    const tick = () => { const sec = Math.floor((Date.now() - c.startedAt) / 1000); $('exam-timer').textContent = `⏱ ${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`; };
+    tick(); timerHandle = setInterval(tick, 1000);
+    show('exam');
+    setTheme(s);
+}
+function leaveExam() {
+    clearInterval(timerHandle);
+    if (store.current) { store.current.elapsed = Date.now() - store.current.startedAt; saveStore(); }
+}
+
+function qHeader(q, i) {
+    let tag;
+    if (q.type === 'th') tag = esc(q.label);
+    else if (q.type === 'td') tag = `계 ${q.ch}장${q.v ? ' ' + q.v + '절' : ''}`;
+    else tag = `계 ${q.ch}:${q.v}` + (q.type === 'mv' ? ' · 구절 전체 쓰기' : ' · 괄호 넣기');
+    return `<div class="flex items-center gap-2"><span class="w-7 h-7 rounded-lg bg-grad text-white text-[13px] font-black flex items-center justify-center shrink-0">${i + 1}</span><span class="pill bg-soft text-c2">${tag}</span></div>`;
+}
+function verseBox(ch, v) {
+    const t = v && DATA.verses['ch' + ch] && DATA.verses['ch' + ch][v];
+    return t ? `<div class="mt-2 rounded-xl bg-slate-50 border border-slate-100 px-3 py-2 text-[12px] text-slate-500 leading-relaxed break-keep"><b class="text-slate-600">계 ${ch}:${v}</b> ${esc(t.trim())}</div>` : '';
+}
+const blankWidth = s => `min(${Math.max(s.length * 1.05 + 1.4, 4.5).toFixed(1)}rem, 100%)`;
+function blankInput(i, p, answer, val) {
+    return `<input class="blank" style="width:${blankWidth(answer)}" data-q="${i}" data-p="${p}" value="${esc(val || '')}" lang="ko" autocomplete="off" spellcheck="false" enterkeyhint="next">`;
+}
+function theologyPrompt(q) {
+    if (q.kind === 'title') return `<b>${esc(q.q)}</b>의 제목을 쓰시오.`;
+    if (q.kind === 'parable') return `‘<b>${esc(q.q)}</b>’의 비유적 의미를 쓰시오.`;
+    return nl2br(q.q);
+}
+function renderQuestion(q, i, vals) {
+    let body = '';
+    if (q.type === 'th') {
+        body = `<p class="text-[15px] font-bold text-slate-800 leading-relaxed break-keep">${theologyPrompt(q)}</p>` +
+            q.parts.map((_, p) => `<div class="mt-2 flex gap-2 items-start">${q.parts.length > 1 ? `<span class="text-c1 font-black mt-2">${'①②③④⑤⑥⑦⑧⑨⑩'[p]}</span>` : ''}<textarea rows="${q.kind === 'final' ? 2 : 1}" class="ans" data-q="${i}" data-p="${p}" lang="ko" placeholder="답을 쓰세요">${esc(vals[p] || '')}</textarea></div>`).join('');
+    } else if (q.type === 'td') {
+        let b = 0;
+        const html = q.t.split(/\{\{(.*?)\}\}/).map((part, k) => { if (k % 2 === 0) return esc(part); const p = b++; return blankInput(i, p, part, vals[p]); }).join('');
+        body = `<p class="text-[17px] font-black text-slate-900 break-keep">${esc(q.q)}</p>
+            <p class="mt-2 text-[15px] leading-9 text-slate-700 break-keep">${html}</p>
+            ${q.r ? `<p class="text-[11px] text-slate-400 mt-1">관련 성구: ${esc(q.r)}</p>` : ''}${verseBox(q.ch, q.v)}`;
+    } else if (q.type === 'mb') {
+        body = `<p class="text-[15px] leading-9 text-slate-700 break-keep">${esc(q.before)} ${blankInput(i, 0, q.parts[0], vals[0])} ${esc(q.after)}</p>`;
+    } else {
+        body = `<p class="text-[14px] font-bold text-slate-700">계시록 ${q.ch}장 ${q.v}절 전체를 쓰시오.</p>
+            <textarea rows="4" class="ans mt-2" data-q="${i}" data-p="0" lang="ko" placeholder="구절 전체를 쓰세요">${esc(vals[0] || '')}</textarea>`;
+    }
+    return `<div class="card p-4" id="q-${i}"><div class="mb-2">${qHeader(q, i)}</div>${body}</div>`;
+}
+function updateProgress() {
+    const c = store.current, n = c.exam.questions.length;
+    const done = c.answers.filter(a => a.every(x => String(x).trim())).length;
+    $('exam-progress').textContent = `${done} / ${n} 작성`;
+    $('exam-bar').style.width = (done / n * 100) + '%';
+}
+$('exam-list').addEventListener('input', e => {
+    const el = e.target; if (el.dataset.q == null || !store.current) return;
+    store.current.answers[+el.dataset.q][+el.dataset.p] = el.value;
+    saveStore(); // 새로고침해도 쓰던 답 유지
+    updateProgress();
+});
+// 쓰고 Enter → 다음 칸(다음 문항)으로. 서술형 칸에서 줄바꿈이 필요하면 Shift+Enter.
+$('exam-list').addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || e.isComposing || e.shiftKey) return;
+    const fields = [...document.querySelectorAll('#exam-list [data-q]')];
+    const i = fields.indexOf(e.target); if (i < 0) return;
+    e.preventDefault();
+    if (fields[i + 1]) { fields[i + 1].focus(); fields[i + 1].scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+    else e.target.blur();
+});
+$('exam-back').onclick = () => { leaveExam(); show('home'); toast('쓰던 답은 저장돼 있어요'); };
+$('exam-submit').onclick = () => {
+    const c = store.current;
+    const empty = c.answers.filter(a => a.some(x => !String(x).trim())).length;
+    if (empty && !confirm(`아직 비어 있는 문항이 ${empty}개 있어요. 그래도 채점할까요?`)) return;
+    clearInterval(timerHandle);
+    const rec = { key: c.key, exam: c.exam, answers: c.answers, results: c.exam.questions.map((q, i) => gradeQuestion(q, c.answers[i])), overrides: {}, elapsed: Date.now() - c.startedAt, at: Date.now() };
+    rec.score = calcScore(rec);
+    rec.full = rec.results.filter(r => r.every(Boolean)).length;
+    store.history.unshift(rec);
+    store.history.length = Math.min(store.history.length, HISTORY_MAX);
+    store.current = null;
+    saveStore();
+    showResult(rec);
+};
+
+// ───────── 결과 ─────────
+let shown = null;
+function showResult(rec) {
+    shown = rec;
+    $('res-date').textContent = `📖 오늘의 양식 · ${fmtWhen(rec.at)}`;
+    $('res-title').textContent = examName(rec.key);
+    $('res-wrong-only').checked = false;
+    renderResultBody();
+    show('result');
+    setTheme(parseKey(rec.key).s);
+}
+function resultBlankHtml(src, r, ans) {
+    let b = 0;
+    return src.split(/\{\{(.*?)\}\}/).map((part, k) => {
+        if (k % 2 === 0) return esc(part);
+        const idx = b++;
+        return r[idx] ? `<span class="blank ok">${esc(ans[idx] || part)}</span>`
+            : `<span class="blank ng">${esc(ans[idx] || '(빈칸)')}</span> <span class="font-black text-emerald-700">→ ${esc(part)}</span>`;
+    }).join('');
+}
+function renderResultBody() {
+    const rec = shown, exam = rec.exam;
+    const isOk = i => !!rec.overrides[i] || rec.results[i].every(Boolean);
+    rec.score = calcScore(rec);
+    rec.full = rec.results.filter((_, i) => isOk(i)).length;
+    const sec = Math.round((rec.elapsed || 0) / 1000);
+    $('res-score').textContent = rec.score;
+    $('res-sub').textContent = `${exam.questions.length}문항 중 ${rec.full}문항 정답 · 걸린 시간 ${Math.floor(sec / 60)}분 ${sec % 60}초`;
+    $('res-msg').textContent = '매일 조금씩, 계시록 통달 ✔';
+    const wrongOnly = $('res-wrong-only').checked;
+    const html = exam.questions.map((q, i) => {
+        const r = rec.results[i], ok = isOk(i);
+        if (wrongOnly && ok) return '';
+        const ans = rec.answers[i] || [];
+        let body = '';
+        if (q.type === 'td') {
+            body = `<p class="text-[16px] font-black text-slate-900">${esc(q.q)}</p>
+                <p class="mt-1 text-[15px] leading-9 text-slate-700 break-keep">${resultBlankHtml(q.t, r, ans)}</p>${verseBox(q.ch, q.v)}`;
+        } else if (q.type === 'mb') {
+            body = `<p class="text-[15px] leading-9 text-slate-700 break-keep">${resultBlankHtml(`${q.before} {{${q.parts[0]}}} ${q.after}`, r, ans)}</p>`;
+        } else if (q.type === 'mv') {
+            body = `<p class="text-[14px] font-bold text-slate-700">계시록 ${q.ch}장 ${q.v}절</p>
+                <p class="mt-2 text-[13px] text-slate-500 break-keep">내 답: ${esc(ans[0] || '(빈칸)')}</p>
+                <p class="mt-2 text-[15px] leading-relaxed text-slate-800 bg-slate-50 rounded-xl p-3 break-keep">${r[0] ? esc(q.parts[0]) : memoWordDiff(q.parts[0], ans[0])}</p>
+                ${r[0] ? '' : '<p class="text-[11px] text-rose-500 mt-1">빨간 밑줄 = 틀리거나 빠진 어절</p>'}`;
+        } else {
+            body = `<p class="text-[15px] font-bold text-slate-800 break-keep">${theologyPrompt(q)}</p>` + q.parts.map((p, k) => `
+                <div class="mt-2 rounded-xl border ${r[k] || rec.overrides[i] ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'} p-3">
+                    <p class="text-[12px] text-slate-500 break-keep">내 답: <b class="text-slate-700">${esc(ans[k] || '(빈칸)')}</b></p>
+                    <p class="text-[14px] font-bold text-emerald-800 mt-1 break-keep">정답: ${nl2br(p)}</p>
+                </div>`).join('') +
+                (q.x ? `<details class="mt-2"><summary class="text-[12px] font-bold text-c1 cursor-pointer">해설 보기</summary><p class="text-[13px] text-slate-600 mt-1 leading-relaxed break-keep">${nl2br(q.x)}</p></details>` : '');
+            // 서술형은 자동 채점이 완벽할 수 없으므로, 뜻이 맞으면 본인이 정답으로 인정할 수 있게 한다
+            if (!r.every(Boolean)) body += `<button class="mt-2 text-[12px] font-black px-3 py-1.5 rounded-lg ${rec.overrides[i] ? 'bg-emerald-600 text-white' : 'bg-white border border-slate-300 text-slate-600'}" data-override="${i}">${rec.overrides[i] ? '✔ 정답으로 인정함 (취소)' : '내 답도 뜻이 맞아요 → 정답 인정'}</button>`;
+        }
+        const pts = Math.round(qPoints(rec, i) * 10) / 10;
+        return `<div class="card p-4 ${ok ? '' : 'wrong'}">
+            <div class="flex items-center justify-between mb-2">${qHeader(q, i)}<span class="font-jua text-lg ${ok ? 'text-emerald-600' : 'text-rose-500'}">${ok ? '⭕' : '❌'} ${pts}점</span></div>
+            ${body}</div>`;
+    }).join('');
+    $('res-list').innerHTML = html || '<p class="card p-5 text-center text-slate-500 font-bold">틀린 문제가 없어요! 🎉</p>';
+}
+$('res-wrong-only').onchange = renderResultBody;
+$('res-list').addEventListener('click', e => {
+    const b = e.target.closest('[data-override]'); if (!b) return;
+    const i = +b.dataset.override;
+    shown.overrides[i] = !shown.overrides[i];
+    renderResultBody(); saveStore();
+});
+$('res-retry').onclick = () => { store.sel = shown.key; startExam(shown.key); };
+$('res-home').onclick = () => show('home');
+$('res-share').onclick = async () => {
+    const text = `📖 오늘의 양식 · 계시록 통달 자격증 연습 시험\n${examName(shown.key)} ${shown.score}점 (${shown.full}/${shown.exam.questions.length}문항 정답) ✍️`;
+    try {
+        if (navigator.share) await navigator.share({ text });
+        else { await navigator.clipboard.writeText(text); toast('결과가 복사됐어요. 단톡방에 붙여넣기 하세요'); }
+    } catch (e) { /* 공유 취소 */ }
+};
+window.addEventListener('pagehide', () => { if (!$('view-exam').classList.contains('hidden')) leaveExam(); });
+
+show('home');
+</script>
+</body>
+</html>
