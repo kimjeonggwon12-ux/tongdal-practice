@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <script src="data.js"></script>
+    <script src="data.js?v=1019"></script>
     <style>
         body { font-family: 'Noto Sans KR', sans-serif; background: #f4f1ea; -webkit-tap-highlight-color: transparent; }
         .font-jua { font-family: 'Jua', sans-serif; }
@@ -198,6 +198,11 @@
 <script>
 'use strict';
 const DATA = window.EXAM_DATA;
+// 자문회·장로회 특별 전형: 계시록 통달 4급과 같은 공식 144문항에서 출제하고, 점수로 급수가 정해진다(시온 공부방 시험 안내와 동일).
+if (DATA.tongdal && DATA.tongdal.grade4) DATA.tongdal.special = {
+    range: '계 1~22장 공식 144문항 (4급과 같은 문제 · 점수로 급수 결정)',
+    groups: DATA.tongdal.grade4.groups.map(gr => Object.assign({}, gr, { label: '특별전형' })),
+};
 const SUBJECTS = {
     theology: { name: '초중고 신학', en: 'THEOLOGY' },
     tongdal:  { name: '계시록 통달', en: 'MASTERY' },
@@ -205,10 +210,13 @@ const SUBJECTS = {
 };
 const SUBJECT_ORDER = ['theology', 'tongdal', 'memo'];
 const GRADES = ['grade4', 'grade3', 'grade2', 'grade1'];
-const gradeLabel = g => g.replace('grade', '') + '급';
+const gradeLabel = g => g === 'special' ? '특별전형' : g.replace('grade', '') + '급';
+const gradesOf = s => s === 'tongdal' ? GRADES.concat('special') : GRADES;
+// 특별 전형 점수별 급수: 90점↑ 1급 · 80점↑ 2급 · 70점↑ 3급 · 60점↑ 4급
+const specialGrade = score => score >= 90 ? '1급' : score >= 80 ? '2급' : score >= 70 ? '3급' : score >= 60 ? '4급' : '';
 const examKey = (s, g) => s + '-' + g;
 const parseKey = k => { const [s, g] = k.split('-'); return { s, g }; };
-const examName = k => { const { s, g } = parseKey(k); return `${SUBJECTS[s].name} ${gradeLabel(g)}`; };
+const examName = k => { const { s, g } = parseKey(k); return g === 'special' ? `${SUBJECTS[s].name} 자문회·장로회 특별전형` : `${SUBJECTS[s].name} ${gradeLabel(g)}`; };
 const rangeOf = k => { const { s, g } = parseKey(k); return s === 'memo' ? DATA.memo.grades[g].rangeLabel : DATA[s][g].range; };
 const QN = 10;
 const HISTORY_MAX = 60;
@@ -400,10 +408,11 @@ function renderHome() {
     const { s, g } = parseKey(store.sel);
     setTheme(s);
     $('subject-tabs').innerHTML = SUBJECT_ORDER.map(k => `<button class="subj th-${k} ${k === s ? 'on' : ''}" data-subject="${k}"><div class="k">${SUBJECTS[k].en}</div><div class="n">${SUBJECTS[k].name}</div></button>`).join('');
-    $('grade-tabs').innerHTML = GRADES.map(k => {
+    $('grade-tabs').style.gridTemplateColumns = `repeat(${gradesOf(s).length}, 1fr)`;
+    $('grade-tabs').innerHTML = gradesOf(s).map(k => {
         const key = examKey(s, k);
         const last = store.history.find(h => h.key === key);
-        return `<button class="gtab ${k === g ? 'on' : ''}" data-grade="${k}"><div class="g">${gradeLabel(k)}</div><div class="m">${last ? '최근 ' + last.score + '점' : '10문항'}</div></button>`;
+        return `<button class="gtab ${k === g ? 'on' : ''}" data-grade="${k}"><div class="g"${k === 'special' ? ' style="font-size:14px"' : ''}>${gradeLabel(k)}</div><div class="m">${last ? '최근 ' + last.score + '점' : '10문항'}</div></button>`;
     }).join('');
     $('pick-range').textContent = `출제 범위: ${rangeOf(store.sel)}`;
 
@@ -461,7 +470,7 @@ $('cal-next').onclick = () => shiftMonth(1);
 
 document.addEventListener('click', e => {
     const sb = e.target.closest('[data-subject]');
-    if (sb) { store.sel = examKey(sb.dataset.subject, parseKey(store.sel).g); saveStore(); renderHome(); return; }
+    if (sb) { const ns = sb.dataset.subject, og = parseKey(store.sel).g; store.sel = examKey(ns, gradesOf(ns).includes(og) ? og : 'grade4'); saveStore(); renderHome(); return; }
     const gb = e.target.closest('[data-grade]');
     if (gb) { store.sel = examKey(parseKey(store.sel).s, gb.dataset.grade); saveStore(); renderHome(); return; }
     if (e.target.closest('#resume-btn')) { resumeExam(); return; }
@@ -604,7 +613,8 @@ function renderResultBody() {
     const sec = Math.round((rec.elapsed || 0) / 1000);
     $('res-score').textContent = rec.score;
     $('res-sub').textContent = `${exam.questions.length}문항 중 ${rec.full}문항 정답 · 걸린 시간 ${Math.floor(sec / 60)}분 ${sec % 60}초`;
-    $('res-msg').textContent = '매일 조금씩, 계시록 통달';
+    const sg = parseKey(rec.key).g === 'special' ? specialGrade(rec.score) : null;
+    $('res-msg').textContent = sg === null ? '매일 조금씩, 계시록 통달' : sg ? `특별전형 기준 ${sg} (90점↑1급·80점↑2급·70점↑3급·60점↑4급)` : '특별전형 기준 60점 미만 — 매일 조금씩, 계시록 통달';
     const wrongOnly = $('res-wrong-only').checked;
     const html = exam.questions.map((q, i) => {
         const r = rec.results[i], ok = isOk(i);
