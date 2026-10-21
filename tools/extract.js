@@ -1,7 +1,9 @@
 // 시온 공부방 3개 앱의 문제은행을 읽어서(수정 없이) 연습시험 앱용 data.js 를 만든다.
 const fs = require('fs'), vm = require('vm');
 const path = require('path');
-const ROOT = path.join(__dirname, '..', '..', '시온 공부방') + '/';
+// 2026-10-21: 시온 공부방이 새 주소(study-room, Next.js)로 옮겨 문제 파일은 study-room/public 에 있다.
+// 옛 '시온 공부방' 폴더의 화면은 이제 새 주소로 보내는 이동 페이지뿐이다.
+const ROOT = path.join(__dirname, '..', '..', 'study-room', 'public') + '/';
 const OUT = process.argv[2] || path.join(__dirname, '..', 'data.js');
 
 // "const NAME = ..." 또는 "function NAME(...) {...}" 선언 전체를 괄호 균형으로 잘라낸다.
